@@ -1,62 +1,59 @@
-﻿using BLL.Interfaces.Args;
+﻿using BLL.Interfaces.Logger;
+using BLL.Interfaces.MailGenerator;
 using BLL.Interfaces.Services;
 using System;
 using System.ComponentModel;
-using System.Net;
 using System.Net.Mail;
-using System.Net.Mime;
+using System.Threading;
 
 namespace BLL.Services
 {
     public sealed class MailService : IMailService<string>
     {
-        public event EventHandler<MailArgs> SendCompleted = delegate {};
+        private readonly IMailGenerator<string> _mailGenerator;
+        private readonly ILogger _logger;
+
+        public MailService(IMailGenerator<string> mailGenerator, ILogger logger)
+        {
+            _mailGenerator = mailGenerator ?? throw new ArgumentNullException(nameof(mailGenerator));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public bool Send(string fileName)
         {
             bool result = false;
-            //Авторизация на SMTP сервере
-            SmtpClient Smtp = new SmtpClient("smtp.mail.ru", 2525);
-            Smtp.Credentials = new NetworkCredential("auto_mailler@mail.ru", "Y4R6N4d2C4");
-            Smtp.EnableSsl = true;
-
-            Smtp.SendCompleted += delegate (object sender, AsyncCompletedEventArgs e)
+            var smtp = new SmtpClient
             {
-                var token = (string)e.UserState;
+                EnableSsl = true
+            };
 
+            smtp.SendCompleted += delegate (object sender, AsyncCompletedEventArgs e)
+            {
                 if (e.Cancelled)
                 {
-                    Console.WriteLine("[{0}] Send canceled.", token);
+                    _logger.LogInfo($"The message with {fileName} was cancelled.");
                 }
                 if (e.Error != null)
                 {
-                    Console.WriteLine("[{0}] {1}", token, e.Error.ToString());
+                    _logger.LogError($"The message with {fileName} wasn't sent.", e.Error);
                 }
                 else
                 {
-                    Console.WriteLine("Message sent.");
+                    _logger.LogInfo("Message was sent.");
                     result = true;
                 }
             };
 
-            //Формирование письма
-            MailMessage Message = new MailMessage();
-            Message.From = new MailAddress("auto_mailler@mail.ru");
-            Message.To.Add(new MailAddress("zhikhanastasya@gmail.com"));
-            Message.Subject = "Заголовок";
-            Message.Body = "Сообщение";
+            try
+            {
+                smtp.SendMailAsync(_mailGenerator.GenerateMessage(fileName));
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+            }
 
-            Attachment attach = new Attachment(fileName, MediaTypeNames.Application.Octet);
-
-            // Добавляем информацию для файла
-            ContentDisposition disposition = attach.ContentDisposition;
-            disposition.CreationDate = System.IO.File.GetCreationTime(fileName);
-            disposition.ModificationDate = System.IO.File.GetLastWriteTime(fileName);
-            disposition.ReadDate = System.IO.File.GetLastAccessTime(fileName);
-
-            Message.Attachments.Add(attach);
-            Smtp.SendAsync(Message, "");//отправка
-
+            Thread.Sleep(1000);
             return result;
         }
     }

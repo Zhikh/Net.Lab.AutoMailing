@@ -1,24 +1,30 @@
-﻿using BLL.Interfaces.Args;
-using BLL.Interfaces.Directoty;
+﻿using BLL.Interfaces.Directoty;
+using BLL.Interfaces.Logger;
 using BLL.Interfaces.Services;
+using BLL.Interfaces.SetUp;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Mail;
+using System.Threading;
 
 namespace BLL.Services
 {
     public sealed class DirectoryService: IDirectoryService
     {
-        private IDirectoryWatcher _watcher;
-        private IMailService<string> _mailService;
+        private readonly IDirectoryWatcher _watcher;
+        private readonly IMailService<string> _mailService;
+        private readonly ISetUpManager _setUpManager;
+        private readonly ILogger _logger;
 
-        public DirectoryService(IDirectoryWatcher watcher, IMailService<string> mailService)
+        private string[] extensions = { ".txt", ".docx" };
+
+        public DirectoryService(IDirectoryWatcher watcher, IMailService<string> mailService, ISetUpManager setUpManager, ILogger logger)
         {
             _watcher = watcher ?? throw new ArgumentNullException(nameof(watcher));
             _mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
+            _setUpManager = setUpManager ?? throw new ArgumentNullException(nameof(setUpManager));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void StartWatching()
@@ -26,42 +32,48 @@ namespace BLL.Services
             _watcher.FileCreated += new FileSystemEventHandler(OnCreated);
             _watcher.FileDeleted += new FileSystemEventHandler(OnChanged);
 
-            _watcher.Run();
+            try
+            {
+                _watcher.Run();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+            }
         }
 
         private void OnCreated(object source, FileSystemEventArgs e)
         {
-            int count = 0;
+            var extension = (Path.GetExtension(e.FullPath) ?? string.Empty).ToLower();
 
-            //копирование фалов 
-            DirectoryInfo sourc = new DirectoryInfo(@"D:\test\");
-
-            foreach (FileInfo item in sourc.GetFiles())
+            if (extensions.Any(extension.Equals))
             {
-                if (_mailService.Send(sourc + item.Name))
+                try
                 {
-                    File.Delete(sourc + item.Name);
+                    if (File.Exists(e.FullPath) && _mailService.Send(e.FullPath))
+                    {
+                        Thread.Sleep(20000);
+                        File.Delete(e.FullPath);
+                    }
                 }
-
-                count++;
+                catch (SmtpFailedRecipientsException ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
+                catch (SmtpException ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message, ex);
+                }
             }
-
-            //  
-            if (count > 1) System.Console.WriteLine(count);
-            else if (count == 1) System.Console.WriteLine(count);
         }
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            System.Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
-        }
-
-        private void OnSendCompleted(object sender, MailArgs eventArgs)
-        {
-            if (eventArgs.IsCompleted && File.Exists(eventArgs.FileName))
-            {
-                File.Delete(eventArgs.FileName);
-            }
+            _logger.LogInfo("File: " + e.FullPath + " " + e.ChangeType);
         }
     }
 }
