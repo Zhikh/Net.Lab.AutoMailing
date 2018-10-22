@@ -28,6 +28,7 @@ namespace BLL.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <inheritdoc/>
         public void StartWatching()
         {
             _watcher.FileCreated += new FileSystemEventHandler(OnCreated);

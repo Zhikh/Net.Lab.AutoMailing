@@ -20,6 +20,7 @@ namespace BLL.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <inheritdoc/>
         public bool Send(string fileName)
         {
             bool result = false;

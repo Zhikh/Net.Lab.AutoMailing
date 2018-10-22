@@ -16,6 +16,7 @@ namespace BLL.Directory.MailGenerator
             _setUpManager = setUpManager ?? throw new ArgumentNullException(nameof(setUpManager));
         }
 
+        /// <inheritdoc/>
         public MailMessage GenerateMessage(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))

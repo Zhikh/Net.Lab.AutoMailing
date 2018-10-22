@@ -16,10 +16,13 @@ namespace BLL.Directory
             _setUpManager = setUpManager ?? throw new ArgumentNullException(nameof(setUpManager));
         }
 
+        /// <inheritdoc/>
         public event FileSystemEventHandler FileCreated = delegate { };
 
+        /// <inheritdoc/>
         public event FileSystemEventHandler FileDeleted = delegate { };
 
+        /// <inheritdoc/>
         public void Run()
         {
             var watcher = new FileSystemWatcher

@@ -5,19 +5,10 @@ namespace BLL.Directory.Logger
 {
     public sealed class Logger : ILogger
     {
-        #region Constants
         private const string LOG_FILE = "log.txt";
-        #endregion
+        private readonly NLog.Logger logger;
 
-        #region Fields
-        private NLog.Logger logger;
-        #endregion
-
-        #region Public API
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Logger" /> for logging in file.
-        /// </summary>
-        /// <param name="fileName"> Name of logger file. </param>
+        /// <inheritdoc/>
         public Logger()
         {
             logger = NLog.LogManager.GetCurrentClassLogger();
@@ -31,43 +22,28 @@ namespace BLL.Directory.Logger
             NLog.LogManager.Configuration = config;
         }
 
-        /// <summary>
-        /// Saves error data to logger
-        /// </summary>
-        /// <param name="message"> Message for saving </param>
-        /// <param name="ex"> Exception </param>
+        /// <inheritdoc/>
         public void LogError(string message, Exception ex)
         {
             logger.Error(ex.StackTrace, message);
         }
 
-        /// <summary>
-        /// Saves data of fatal error to logger
-        /// </summary>
-        /// <param name="message"> Message for saving </param>
-        /// <param name="ex"> Exception </param>
+        /// <inheritdoc/>
         public void LogFatal(string message, Exception ex)
         {
             logger.Fatal(ex.StackTrace, message);
         }
 
-        /// <summary>
-        /// Saves info data to logger
-        /// </summary>
-        /// <param name="message"> Message for saving </param>
+        /// <inheritdoc/>
         public void LogInfo(string message)
         {
             logger.Info(message);
         }
 
-        /// <summary>
-        /// Saves warn data to logger
-        /// </summary>
-        /// <param name="message"> Message for saving </param>
+        /// <inheritdoc/>
         public void LogWarn(string message)
         {
             logger.Warn(message);
         }
-        #endregion
     }
 }

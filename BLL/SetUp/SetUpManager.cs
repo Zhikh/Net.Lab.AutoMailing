@@ -6,6 +6,7 @@ namespace BLL.Configuration
 {
     public class SetUpManager : ISetUpManager
     {
+        /// <inheritdoc/>
         public string ReadSetting(string key)
         {
             string result = null;
@@ -22,6 +23,7 @@ namespace BLL.Configuration
             return result;
         }
 
+        /// <inheritdoc/>
         public void AddUpdateSetting(string key, string value)
         {
             try

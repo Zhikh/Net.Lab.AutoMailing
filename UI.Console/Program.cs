@@ -1,5 +1,4 @@
 ﻿using BLL.Interfaces.Services;
-using BLL.Interfaces.SetUp;
 using IoC;
 using Ninject;
 
@@ -19,18 +18,9 @@ namespace UI.Console
         {
             IDirectoryService service = _resolver.Get<IDirectoryService>();
             service.StartWatching();
-            ISetUpManager setUpManager = _resolver.Get<ISetUpManager>();
 
             System.Console.WriteLine("Press \'q\' to exit.");
-            while (System.Console.Read() != 'q')
-            {
-                if (System.Console.ReadLine() != "edit'")
-                {
-                    System.Console.WriteLine("Add receiver:");
-                    var receiver = System.Console.ReadLine();
-                    setUpManager.AddUpdateSetting(SetUpConstants.ReceiverMailAddress, receiver);
-                }
-            };
+            while (System.Console.Read() != 'q');
         }
     }
 }
