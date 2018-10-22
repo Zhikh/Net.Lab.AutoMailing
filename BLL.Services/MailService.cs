@@ -1,10 +1,10 @@
-﻿using BLL.Interfaces.Logger;
-using BLL.Interfaces.MailGenerator;
-using BLL.Interfaces.Services;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Net.Mail;
 using System.Threading;
+using BLL.Interfaces.Logger;
+using BLL.Interfaces.MailGenerator;
+using BLL.Interfaces.Services;
 
 namespace BLL.Services
 {
@@ -28,12 +28,13 @@ namespace BLL.Services
                 EnableSsl = true
             };
 
-            smtp.SendCompleted += delegate (object sender, AsyncCompletedEventArgs e)
+            smtp.SendCompleted += delegate(object sender, AsyncCompletedEventArgs e)
             {
                 if (e.Cancelled)
                 {
                     _logger.LogInfo($"The message with {fileName} was cancelled.");
                 }
+
                 if (e.Error != null)
                 {
                     _logger.LogError($"The message with {fileName} wasn't sent.", e.Error);

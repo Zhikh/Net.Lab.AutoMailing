@@ -1,5 +1,5 @@
-﻿using BLL.Interfaces.Logger;
-using System;
+﻿using System;
+using BLL.Interfaces.Logger;
 
 namespace BLL.Directory.Logger
 {

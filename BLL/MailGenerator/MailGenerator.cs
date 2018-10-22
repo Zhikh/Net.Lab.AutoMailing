@@ -1,9 +1,9 @@
-﻿using BLL.Interfaces.MailGenerator;
-using BLL.Interfaces.SetUp;
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Mail;
 using System.Net.Mime;
+using BLL.Interfaces.MailGenerator;
+using BLL.Interfaces.SetUp;
 
 namespace BLL.Directory.MailGenerator
 {

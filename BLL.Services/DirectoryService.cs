@@ -1,16 +1,16 @@
-﻿using BLL.Interfaces.Directoty;
-using BLL.Interfaces.Logger;
-using BLL.Interfaces.Services;
-using BLL.Interfaces.SetUp;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading;
+using BLL.Interfaces.Directoty;
+using BLL.Interfaces.Logger;
+using BLL.Interfaces.Services;
+using BLL.Interfaces.SetUp;
 
 namespace BLL.Services
 {
-    public sealed class DirectoryService: IDirectoryService
+    public sealed class DirectoryService : IDirectoryService
     {
         private const int TIME_OUT = 1000;
         private readonly IDirectoryWatcher _watcher;
@@ -37,7 +37,7 @@ namespace BLL.Services
             {
                 _watcher.Run();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.Message, ex);
             }

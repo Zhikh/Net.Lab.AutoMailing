@@ -1,16 +1,14 @@
-﻿using BLL.Interfaces.Directoty;
-using BLL.Interfaces.SetUp;
-using System;
+﻿using System;
 using System.IO;
+using BLL.Interfaces.Directoty;
+using BLL.Interfaces.SetUp;
 
 namespace BLL.Directory
 {
     public sealed class DirectoryWatcher : IDirectoryWatcher
     {
-        public event FileSystemEventHandler FileCreated = delegate { };
-        public event FileSystemEventHandler FileDeleted = delegate { };
-
         private const string EXTENSION = "*.*";
+
         private ISetUpManager _setUpManager;
 
         public DirectoryWatcher(ISetUpManager setUpManager)
@@ -18,12 +16,17 @@ namespace BLL.Directory
             _setUpManager = setUpManager ?? throw new ArgumentNullException(nameof(setUpManager));
         }
 
+        public event FileSystemEventHandler FileCreated = delegate { };
+
+        public event FileSystemEventHandler FileDeleted = delegate { };
+
         public void Run()
         {
-            var watcher = new FileSystemWatcher();
-
-            watcher.Path = _setUpManager.ReadSetting(SetUpConstants.SourcePath);
-            watcher.Filter = EXTENSION;
+            var watcher = new FileSystemWatcher
+            {
+                Path = _setUpManager.ReadSetting(SetUpConstants.SourcePath),
+                Filter = EXTENSION
+            };
 
             watcher.Created += new FileSystemEventHandler(OnCreated);
             watcher.Deleted += new FileSystemEventHandler(OnDeleted);

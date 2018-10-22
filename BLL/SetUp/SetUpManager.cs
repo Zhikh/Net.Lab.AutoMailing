@@ -1,6 +1,6 @@
-﻿using BLL.Interfaces.SetUp;
-using System;
+﻿using System;
 using System.Configuration;
+using BLL.Interfaces.SetUp;
 
 namespace BLL.Configuration
 {

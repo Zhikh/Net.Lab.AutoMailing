@@ -263,3 +263,4 @@ __pycache__/
 *.config
 AssemblyInfo.cs
 Net.Lab.AutoMailing.sln
+*.StyleCop
