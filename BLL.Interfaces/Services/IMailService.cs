@@ -1,7 +1,10 @@
-﻿namespace BLL.Interfaces.Services
+﻿using BLL.Interfaces.Args;
+using System;
+
+namespace BLL.Interfaces.Services
 {
     public interface IMailService<in T>
     {
-        void Send(T data);
+        bool Send(T data);
     }
 }

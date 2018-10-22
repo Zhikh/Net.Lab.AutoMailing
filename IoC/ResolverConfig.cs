@@ -18,8 +18,11 @@ namespace IoC
             kernel.Bind<IDirectoryWatcher>().To<DirectoryWatcher>();
 
             // services
+            kernel.Bind<IMailService<string>>().To<MailService>();
+
             kernel.Bind<IDirectoryService>().To<DirectoryService>()
-                .WithConstructorArgument("watcher", kernel.Get<IDirectoryWatcher>());
+                .WithConstructorArgument("watcher", kernel.Get<IDirectoryWatcher>())
+                .WithConstructorArgument("mailService", kernel.Get<IMailService<string>>());
 
             // strategy
         }

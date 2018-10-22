@@ -1,4 +1,5 @@
-﻿using BLL.Interfaces.Directoty;
+﻿using BLL.Interfaces.Args;
+using BLL.Interfaces.Directoty;
 using BLL.Interfaces.Services;
 using System;
 using System.Collections.Generic;
@@ -37,11 +38,14 @@ namespace BLL.Services
 
             foreach (FileInfo item in sourc.GetFiles())
             {
-                _mailService.Send(sourc + item.Name);
+                if (_mailService.Send(sourc + item.Name))
+                {
+                    File.Delete(sourc + item.Name);
+                }
 
-                File.Delete(sourc + item.Name); //удаление после копирования
                 count++;
             }
+
             //  
             if (count > 1) System.Console.WriteLine(count);
             else if (count == 1) System.Console.WriteLine(count);
@@ -50,6 +54,14 @@ namespace BLL.Services
         private void OnChanged(object source, FileSystemEventArgs e)
         {
             System.Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+        }
+
+        private void OnSendCompleted(object sender, MailArgs eventArgs)
+        {
+            if (eventArgs.IsCompleted && File.Exists(eventArgs.FileName))
+            {
+                File.Delete(eventArgs.FileName);
+            }
         }
     }
 }
