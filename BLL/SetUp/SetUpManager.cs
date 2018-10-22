@@ -14,9 +14,9 @@ namespace BLL.Configuration
             {
                 result = ConfigurationManager.AppSettings[key];
             }
-            catch (ConfigurationErrorsException)
+            catch (ConfigurationErrorsException ex)
             {
-                Console.WriteLine("Error reading app settings");
+                new Exception("Can't read app settings", ex);
             }
 
             return result;
@@ -41,9 +41,9 @@ namespace BLL.Configuration
                 configFile.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
             }
-            catch (ConfigurationErrorsException)
+            catch (ConfigurationErrorsException ex)
             {
-                Console.WriteLine("Error writing app settings");
+                new Exception("Can't write app settings", ex);
             }
         }
     }

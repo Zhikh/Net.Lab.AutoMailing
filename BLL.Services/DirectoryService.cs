@@ -12,6 +12,7 @@ namespace BLL.Services
 {
     public sealed class DirectoryService: IDirectoryService
     {
+        private const int TIME_OUT = 1000;
         private readonly IDirectoryWatcher _watcher;
         private readonly IMailService<string> _mailService;
         private readonly ISetUpManager _setUpManager;
@@ -52,7 +53,7 @@ namespace BLL.Services
                 {
                     if (File.Exists(e.FullPath) && _mailService.Send(e.FullPath))
                     {
-                        Thread.Sleep(20000);
+                        Thread.Sleep(TIME_OUT);
                         File.Delete(e.FullPath);
                     }
                 }

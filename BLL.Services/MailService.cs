@@ -10,6 +10,7 @@ namespace BLL.Services
 {
     public sealed class MailService : IMailService<string>
     {
+        private const int TIME_OUT = 1000;
         private readonly IMailGenerator<string> _mailGenerator;
         private readonly ILogger _logger;
 
@@ -43,17 +44,13 @@ namespace BLL.Services
                     result = true;
                 }
             };
+            
+            var mail = _mailGenerator.GenerateMessage(fileName);
+            smtp.SendMailAsync(mail);
 
-            try
-            {
-                smtp.SendMailAsync(_mailGenerator.GenerateMessage(fileName));
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex.Message, ex);
-            }
+            Thread.Sleep(TIME_OUT);
+            mail.Dispose();
 
-            Thread.Sleep(1000);
             return result;
         }
     }

@@ -9,7 +9,7 @@ namespace BLL.Directory.MailGenerator
 {
     public sealed class MailGenerator : IMailGenerator<string>
     {
-        private ISetUpManager _setUpManager;
+        private readonly ISetUpManager _setUpManager;
 
         public MailGenerator(ISetUpManager setUpManager)
         {
@@ -23,18 +23,18 @@ namespace BLL.Directory.MailGenerator
                 throw new ArgumentException("Name of file can't be null or empty!", nameof(fileName));
             }
 
-            var Message = new MailMessage();
-
-            Message.To.Add(new MailAddress(_setUpManager.ReadSetting(SetUpConstants.ReceiverMailAddress)));
-            Message.Subject = "The file was added.";
-            Message.Body = $"The file {fileName} was added.";
+            var mail = new MailMessage();
+            
+            mail.To.Add(new MailAddress(_setUpManager.ReadSetting(SetUpConstants.ReceiverMailAddress)));
+            mail.Subject = "The file was added.";
+            mail.Body = $"The file {fileName} was added.";
 
             var attach = new Attachment(fileName, MediaTypeNames.Application.Octet);
 
             CreateAttachment(fileName, attach);
+            mail.Attachments.Add(attach);
 
-            Message.Attachments.Add(attach);
-            return Message;
+            return mail;
         }
 
         private void CreateAttachment(string fileName, Attachment attachment)
@@ -44,7 +44,6 @@ namespace BLL.Directory.MailGenerator
             disposition.CreationDate = File.GetCreationTime(fileName);
             disposition.ModificationDate = File.GetLastWriteTime(fileName);
             disposition.ReadDate = File.GetLastAccessTime(fileName);
-           
         }
     }
 }
