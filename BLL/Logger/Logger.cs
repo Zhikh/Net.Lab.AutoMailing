@@ -7,8 +7,7 @@ namespace BLL.Directory.Logger
     {
         private const string LOG_FILE = "log.txt";
         private readonly NLog.Logger logger;
-
-        /// <inheritdoc/>
+        
         public Logger()
         {
             logger = NLog.LogManager.GetCurrentClassLogger();

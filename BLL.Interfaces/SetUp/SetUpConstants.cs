@@ -6,5 +6,6 @@
         public static readonly string SenderMailAddress = "senderAddress";
         public static readonly string ReceiverMailAddress = "receiverAddress";
         public static readonly string SenderMailPassword = "senderPassword";
+        public static readonly string TimeOut = "timeOut";
     }
 }

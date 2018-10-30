@@ -12,7 +12,6 @@ namespace BLL.Services
 {
     public sealed class DirectoryService : IDirectoryService
     {
-        private const int TIME_OUT = 1000;
         private readonly IDirectoryWatcher _watcher;
         private readonly IMailService<string> _mailService;
         private readonly ISetUpManager _setUpManager;
@@ -54,8 +53,7 @@ namespace BLL.Services
                 {
                     if (File.Exists(e.FullPath) && _mailService.Send(e.FullPath))
                     {
-                        Thread.Sleep(TIME_OUT);
-                        File.Delete(e.FullPath);
+                        DeleteFile(e);
                     }
                 }
                 catch (SmtpFailedRecipientsException ex)
@@ -70,6 +68,22 @@ namespace BLL.Services
                 {
                     _logger.LogError(ex.Message, ex);
                 }
+            }
+        }
+
+        private void DeleteFile(FileSystemEventArgs e)
+        {
+            try
+            {
+                var timeOut = int.Parse(_setUpManager.ReadSetting(SetUpConstants.TimeOut));
+
+                Thread.Sleep(timeOut);
+
+                File.Delete(e.FullPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("TimeOut value hasn't been parsed.", ex);
             }
         }
 

@@ -19,6 +19,10 @@ namespace BLL.Configuration
             {
                 new Exception("Can't read app settings", ex);
             }
+            catch (Exception)
+            {
+                throw;
+            }
 
             return result;
         }
